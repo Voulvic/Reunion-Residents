@@ -40,10 +40,8 @@ Les trois pages sont facilement accessibles via les boutons de navigation en hau
 
 ## 💡 Astuces
 
-- Les PDFs sont optimisés pour l'impression en format A4 paysage
-- Vous pouvez ajouter plusieurs thèmes (jusqu'à 6)
 - Tous les champs sont modifiables facilement
 
 ---
 
-**Développé pour LHSS** 🏛️
+**Développé par Dany**
