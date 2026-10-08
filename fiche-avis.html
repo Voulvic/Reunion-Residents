@@ -264,6 +264,11 @@
             line-height: 1.8;
         }
 
+        /* Petite marge en haut de la 2e page du PDF */
+        .copie-pdf .preview-section-newpage {
+            padding-top: 2rem;
+        }
+
         @media (max-width: 1024px) {
             .container {
                 grid-template-columns: 1fr;
@@ -521,11 +526,30 @@
                 margin: 0,
                 filename: `Fiche-avis_${date}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { format: 'a4', orientation: 'portrait' }
+                jsPDF: { format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'], avoid: '.preview-section' }
             };
             
-            html2pdf().set(opt).from(element).save();
+            genererPDF(element, opt, 794);
+        }
+
+        // Génère le PDF à partir d'une copie de l'aperçu placée en haut de la page,
+        // à la largeur exacte d'une feuille A4 : évite le grand blanc en haut du PDF
+        // quand l'aperçu est plus bas sur la page (petit écran, page défilée...).
+        function genererPDF(element, opt, largeurPx) {
+            const zone = document.createElement('div');
+            zone.style.cssText = 'position:absolute; top:0; left:0; z-index:-1; background:white; width:' + largeurPx + 'px;';
+            const copie = element.cloneNode(true);
+            copie.removeAttribute('id');
+            copie.classList.add('copie-pdf');
+            copie.style.boxShadow = 'none';
+            copie.style.borderRadius = '0';
+            copie.style.width = '100%';
+            zone.appendChild(copie);
+            document.body.appendChild(zone);
+
+            opt.html2canvas = Object.assign({ scale: 2, scrollX: 0, scrollY: 0 }, opt.html2canvas || {});
+            return html2pdf().set(opt).from(copie).save().finally(() => zone.remove());
         }
 
         // Initialisation
