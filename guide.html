@@ -27,46 +27,82 @@
             margin: 0 auto;
         }
 
-        /* Navigation */
-        .nav-top {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            max-width: 1200px;
-            margin: 0 auto 2rem;
-            padding: 1rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-top a {
-            padding: 0.7rem 1.5rem;
-            background: #f0f0f0;
-            color: #333;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .nav-top a:hover {
-            background: #e0e0e0;
-            text-decoration: none;
-        }
-
-        .nav-top a.active {
-            background: #667eea;
-            color: white;
-        }
-
-        /* Titres */
-        h1 {
+        /* En-tête (même style que les autres pages) */
+        .header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
             font-size: 2rem;
             color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Navigation (même style que les autres pages) */
+        .nav-buttons {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 1.5rem;
+            margin: 0.25rem 0.5rem;
+            background: #4facfe;
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            background: #2e8fd6;
+            text-decoration: none;
+        }
+
+        .nav-btn.active {
+            background: #667eea;
+        }
+
+        /* Sommaire des formats */
+        .formats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .format-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .format-card .icon {
+            font-size: 2rem;
+        }
+
+        .format-card .name {
+            font-weight: 600;
+            margin: 0.3rem 0;
+        }
+
+        .format-card .badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #eef0fd;
+            color: #4f5bd5;
         }
 
         /* Sections */
@@ -147,15 +183,6 @@
             color: #e07a2f;
         }
 
-        a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
         .footer {
             text-align: center;
             color: #999;
@@ -166,36 +193,58 @@
         }
 
         /* Mobile */
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
             body {
                 padding: 1rem;
             }
 
-            h1 {
+            .header h1 {
                 font-size: 1.6rem;
-                margin-bottom: 2rem;
+            }
+
+            .formats {
+                grid-template-columns: 1fr;
             }
 
             .guide-section {
                 padding: 1.25rem;
             }
-
-            .nav-top a {
-                padding: 0.6rem 1rem;
-            }
         }
     </style>
 </head>
 <body>
-    <nav class="nav-top">
-        <a href="index.html">🎤 Affiche Réunion</a>
-        <a href="compte-rendu.html">📋 Compte-Rendu</a>
-        <a href="fiche-avis.html">📝 Fiche d'Avis</a>
-        <a href="guide.html" class="active">📖 Guide</a>
+    <div class="header">
+        <h1>📖 Guide d'utilisation</h1>
+        <p>Comment utiliser les outils de la réunion résidents</p>
+    </div>
+
+    <nav class="nav-buttons">
+        <a href="index.html" class="nav-btn">🎤 Affiche Réunion</a>
+        <a href="compte-rendu.html" class="nav-btn">📋 Compte-Rendu</a>
+        <a href="fiche-avis.html" class="nav-btn">📝 Fiche d'Avis</a>
+        <a href="guide.html" class="nav-btn active">📖 Guide</a>
     </nav>
 
     <div class="container">
-        <h1>📖 Guide d'utilisation</h1>
+
+        <!-- Résumé des formats -->
+        <div class="formats">
+            <div class="format-card">
+                <div class="icon">🎤</div>
+                <div class="name">Affiche Réunion</div>
+                <span class="badge">A4 paysage</span>
+            </div>
+            <div class="format-card">
+                <div class="icon">📋</div>
+                <div class="name">Compte-Rendu</div>
+                <span class="badge">A4 portrait</span>
+            </div>
+            <div class="format-card">
+                <div class="icon">📝</div>
+                <div class="name">Fiche d'Avis</div>
+                <span class="badge">A4 portrait · 2 pages</span>
+            </div>
+        </div>
 
         <!-- ========== Affiche Réunion ========== -->
         <section class="guide-section">
@@ -207,39 +256,50 @@
             <h3>Comment l'utiliser - Étapes simples :</h3>
 
             <div class="step">
-                <div class="step-number">Étape 1 : Date, heure, titre et sous-titre</div>
-                <p>Dans le formulaire de gauche, entrez la date et l'heure de votre réunion.</p>
-                <p>Remplissez ensuite le <strong>titre principal</strong> et le <strong>sous-titre</strong> : ce sont les textes qui apparaîtront en grand en haut de l'affiche.</p>
+                <div class="step-number">Étape 1 : Date, titre et sous-titre</div>
+                <p>Dans le formulaire de gauche, remplissez :</p>
+                <ul>
+                    <li><strong>Date et heure</strong> (ex : « Demain à 13h »)</li>
+                    <li><strong>Titre principal</strong> (ex : « Réunion résidents ! »)</li>
+                    <li><strong>Sous-titre</strong> (ex : « Au programme de cette réunion 👇 »)</li>
+                </ul>
             </div>
 
             <div class="step">
                 <div class="step-number">Étape 2 : Ajouter les thèmes</div>
-                <p>Cliquez sur le bouton « + Ajouter un thème » pour ajouter chaque sujet de la réunion.</p>
-                <p>Pour chaque thème, vous devez :</p>
+                <p>Cliquez sur « + Ajouter un thème » pour chaque sujet de la réunion. Chaque thème apparaît sur l'affiche dans une carte de couleur différente.</p>
+                <p>Pour chaque thème, remplissez :</p>
                 <ul>
-                    <li><strong>Choisir un emoji</strong> (😊, 🎯, 💬, etc.)</li>
-                    <li><strong>Écrire le nom du thème</strong> (ex : « Bien-être », « Activités »)</li>
+                    <li><strong>L'emoji</strong> (dans la petite case en haut à gauche)</li>
+                    <li><strong>Le titre du thème</strong> (ex : « Bien-être », « Activités »)</li>
+                    <li><strong>Une courte description</strong></li>
                 </ul>
-                <p><strong>Vous pouvez ajouter jusqu'à 6 thèmes.</strong></p>
+                <p>Le bouton « Retirer » supprime un thème. <strong>Vous pouvez ajouter jusqu'à 6 thèmes.</strong></p>
             </div>
 
             <div class="step">
-                <div class="step-number">Étape 3 : Voir l'aperçu</div>
-                <p>À droite de l'écran, vous voyez immédiatement à quoi va ressembler l'affiche avec vos informations. L'aperçu se met à jour en temps réel !</p>
+                <div class="step-number">Étape 3 : Choisir un emoji</div>
+                <p>En bas du formulaire, une palette d'emojis est classée par catégorie (Hygiène, Repas, Activités, Santé, Logement, Travail).</p>
+                <p>Cliquez sur un emoji pour le copier, puis collez-le (Ctrl+V) dans la case emoji du thème.</p>
             </div>
 
             <div class="step">
-                <div class="step-number">Étape 4 : Télécharger en PDF</div>
+                <div class="step-number">Étape 4 : Voir l'aperçu</div>
+                <p>À droite de l'écran, vous voyez à quoi va ressembler l'affiche. L'aperçu se met à jour dès que vous modifiez un champ.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 5 : Télécharger en PDF</div>
                 <p>Quand tout est prêt, cliquez sur le bouton « 📥 PDF » pour télécharger l'affiche.</p>
-                <p>L'affiche est au format A4 paysage, prête à imprimer !</p>
+                <p>L'affiche est au format <strong>A4 paysage</strong>, prête à imprimer !</p>
             </div>
 
             <div class="tips">
-                <strong>💡 Conseil :</strong> Utilisez des emojis variés et colorés pour rendre l'affiche plus attrayante et facile à lire.
+                <strong>💡 Conseil :</strong> Utilisez des emojis variés et des titres courts pour rendre l'affiche plus attrayante et facile à lire de loin.
             </div>
 
             <div class="example">
-                <strong>📌 Exemple d'affiche :</strong> Date : « Mardi 20 janvier » | Thèmes : « 🎯 Objectifs », « 💬 Discussions », « 🎉 Activités »
+                <strong>📌 Exemple d'affiche :</strong> Date : « Mardi 20 janvier à 14h » | Thèmes : « 🍽️ Repas », « 🎨 Activités », « 🏠 Logement »
             </div>
         </section>
 
@@ -256,31 +316,34 @@
                 <div class="step-number">Étape 1 : Informations générales</div>
                 <p>Remplissez d'abord les informations de base :</p>
                 <ul>
-                    <li><strong>Date de la réunion</strong></li>
-                    <li><strong>Résidents présents</strong> (les noms)</li>
+                    <li><strong>Date de la réunion</strong> (cliquez dans le champ pour choisir la date dans le calendrier)</li>
+                    <li><strong>Résidents présents</strong> (les noms, un par ligne si vous voulez)</li>
                     <li><strong>Professionnels présents</strong> (les noms)</li>
                 </ul>
             </div>
 
             <div class="step">
-                <div class="step-number">Étape 2 : Ajouter une section par thème</div>
-                <p>Cliquez sur « + Ajouter une section » pour chaque thème abordé.</p>
-                <p>Pour chaque section, remplissez :</p>
+                <div class="step-number">Étape 2 : Remplir les sections</div>
+                <p><strong>5 sections vides</strong> sont déjà prêtes : une par thème abordé. Si besoin, cliquez sur « + Ajouter une section » pour en ajouter, ou sur « Retirer » pour supprimer celles qui ne servent pas.</p>
+                <p>Chaque section contient trois champs :</p>
                 <ul>
-                    <li><strong>Titre du thème</strong> (ex : « Activités du mois »)</li>
-                    <li><strong>Description / Détails</strong> (ce qui a été dit, les décisions prises)</li>
-                    <li><strong>Remarques importantes</strong> (les points clés à retenir)</li>
+                    <li><strong>Le titre du thème</strong> (ex : « Activités du mois »)</li>
+                    <li><strong>Le premier cadre</strong> : ce qui a été présenté, les décisions prises</li>
+                    <li><strong>Le second cadre</strong> : les remarques, propositions et échanges des résidents</li>
                 </ul>
+                <p>Un cadre laissé vide n'apparaît pas sur le compte-rendu.</p>
             </div>
 
             <div class="step">
                 <div class="step-number">Étape 3 : Voir l'aperçu</div>
-                <p>L'aperçu à droite montre comment le compte-rendu apparaîtra une fois imprimé.</p>
+                <p>L'aperçu à droite montre le compte-rendu tel qu'il sera imprimé.</p>
+                <p>Pour les sections, l'aperçu se met à jour quand vous cliquez en dehors du champ que vous venez de remplir.</p>
             </div>
 
             <div class="step">
-                <div class="step-number">Étape 4 : Télécharger en PDF</div>
-                <p>Cliquez sur « 📥 PDF » pour télécharger et imprimer votre compte-rendu officiel.</p>
+                <div class="step-number">Étape 4 : Imprimer ou télécharger en PDF</div>
+                <p>Cliquez sur « 🖨️ Imprimer » pour l'imprimer directement, ou sur « 📥 PDF » pour le télécharger et l'archiver.</p>
+                <p>Le compte-rendu est au format <strong>A4 portrait</strong>.</p>
             </div>
 
             <div class="tips">
@@ -288,7 +351,7 @@
             </div>
 
             <div class="example">
-                <strong>📌 Exemple :</strong> Thème : « Menus de la semaine » | Description : « Discussion sur les menus proposés pour la semaine du 20 au 24 janvier » | Remarques : « Les résidents aimeraient plus de fruits frais »
+                <strong>📌 Exemple :</strong> Thème : « Menus de la semaine » | Premier cadre : « Présentation des menus du 20 au 24 janvier » | Second cadre : « Les résidents aimeraient plus de fruits frais »
             </div>
         </section>
 
@@ -297,47 +360,55 @@
             <h2>📝 3. Fiche d'Avis</h2>
 
             <h3>À quoi ça sert ?</h3>
-            <p>La fiche d'avis permet de recueillir facilement les opinions, suggestions et idées des résidents. C'est un formulaire simple qu'ils peuvent remplir après la réunion.</p>
+            <p>La fiche d'avis permet de recueillir facilement les opinions, suggestions et idées des résidents. C'est un formulaire simple qu'ils peuvent remplir après la réunion, avec ou sans leur nom.</p>
 
             <h3>Comment l'utiliser - Étapes simples :</h3>
 
             <div class="step">
                 <div class="step-number">Étape 1 : Remplir les informations de base</div>
-                <p>En haut, indiquez :</p>
                 <ul>
-                    <li><strong>La date</strong> (de la réunion ou de distribution de la fiche)</li>
+                    <li><strong>Date de la réunion</strong> (cliquez dans le champ pour choisir la date)</li>
+                    <li><strong>Phrase d'introduction</strong> : un texte est déjà proposé, vous pouvez le modifier si vous le souhaitez</li>
                 </ul>
             </div>
 
             <div class="step">
                 <div class="step-number">Étape 2 : Ajouter les sujets évoqués lors de la réunion</div>
-                <p>Ajoutez les sujets abordés pendant la réunion sur lesquels vous souhaitez avoir l'avis des résidents.</p>
-                <p>Chaque sujet apparaîtra sur la fiche avec un espace prévu pour que les résidents puissent donner leur avis.</p>
+                <p>Cliquez sur « + Ajouter une option » pour chaque sujet abordé pendant la réunion, puis écrivez son nom.</p>
+                <p>Sur la fiche, les sujets apparaissent sous forme de cases à cocher à la question <em>« Quel sujet vous a le plus intéressé ? »</em>, suivie de lignes pour expliquer pourquoi.</p>
+                <p>Si vous n'ajoutez aucun sujet, cette partie n'apparaît pas sur la fiche.</p>
             </div>
 
             <div class="step">
                 <div class="step-number">Étape 3 : Voir l'aperçu</div>
-                <p>À droite, l'aperçu montre la fiche telle qu'elle sera imprimée, avec tous les sujets ajoutés.</p>
+                <p>À droite, l'aperçu montre la fiche telle qu'elle sera imprimée.</p>
+                <p>En plus de vos sujets, la fiche contient déjà automatiquement :</p>
+                <ul>
+                    <li>Un avis général sur la réunion (de « Très intéressante » à « Peu intéressante »)</li>
+                    <li>Un espace pour les remarques</li>
+                    <li>Un espace pour les idées d'activités, de sorties ou de repas</li>
+                    <li>Un espace pour proposer des sujets pour la prochaine réunion</li>
+                </ul>
             </div>
 
             <div class="step">
-                <div class="step-number">Étape 4 : Télécharger et imprimer</div>
-                <p>Cliquez sur « 📥 PDF » pour télécharger la fiche.</p>
-                <p>Imprimez autant de copies que nécessaire et distribuez-les aux résidents.</p>
+                <div class="step-number">Étape 4 : Imprimer ou télécharger en PDF</div>
+                <p>Cliquez sur « 🖨️ Imprimer » ou sur « 📥 PDF ».</p>
+                <p>La fiche est au format <strong>A4 portrait, sur 2 pages</strong> : pensez à l'imprimer en recto-verso. Imprimez autant de copies que nécessaire et distribuez-les aux résidents.</p>
             </div>
 
             <div class="step">
                 <div class="step-number">Étape 5 : Faire remplir et récupérer</div>
                 <p>Les résidents remplissent la fiche avec leurs avis et suggestions, puis vous la récupérez.</p>
-                <p>Cela vous donne des retours précieux pour améliorer le quotidien !</p>
+                <p>Cela vous donne des retours précieux pour améliorer le quotidien et préparer la prochaine réunion !</p>
             </div>
 
             <div class="tips">
-                <strong>💡 Conseil :</strong> Vérifiez que les sujets ajoutés correspondent bien à ce que vous voulez demander aux résidents.
+                <strong>💡 Conseil :</strong> Reprenez les mêmes sujets que sur l'affiche de la réunion, pour que les résidents s'y retrouvent facilement.
             </div>
 
             <div class="example">
-                <strong>📌 Exemple :</strong> Date : « 18 janvier 2025 » | Sujets : Activités, Repas | Les résidents écrivent ensuite leurs avis dans les espaces prévus.
+                <strong>📌 Exemple :</strong> Date : « 18/01/2025 » | Sujets : « Activités », « Repas », « Ménage des chambres »
             </div>
         </section>
 
@@ -347,26 +418,26 @@
 
             <h3>Pour l'impression :</h3>
             <div class="tips">
-                <p><strong>Format :</strong> Tous les PDF sont en A4 paysage (plus larges que hauts).</p>
-                <p><strong>Imprimante :</strong> Utilisez une imprimante couleur pour un plus beau résultat (surtout pour l'affiche de réunion).</p>
-                <p><strong>Marges :</strong> Les PDF sont déjà optimisés, n'ajoutez pas de marges supplémentaires.</p>
+                <p><strong>Format :</strong> L'affiche est en A4 paysage. Le compte-rendu et la fiche d'avis sont en A4 portrait.</p>
+                <p><strong>Imprimante :</strong> Utilisez une imprimante couleur pour un plus beau résultat, surtout pour l'affiche.</p>
+                <p><strong>Marges :</strong> Les documents sont déjà mis en page, n'ajoutez pas de marges supplémentaires.</p>
             </div>
 
             <h3>Pour les données :</h3>
             <div class="tips">
-                <p><strong>Modification facile :</strong> Vous pouvez modifier vos informations à tout moment, l'aperçu se met à jour instantanément.</p>
+                <p><strong>Modification facile :</strong> Vous pouvez modifier vos informations à tout moment avant de télécharger, l'aperçu suit vos changements.</p>
                 <p><strong>Aucune limite :</strong> Vous pouvez créer autant d'affiches, de comptes-rendus et de fiches que vous voulez.</p>
             </div>
 
             <h3>Si quelque chose ne va pas :</h3>
             <div class="tips">
-                <p><strong>Problème de PDF ?</strong> Actualisez la page (F5 ou Ctrl+R) et réessayez.</p>
-                <p><strong>Données perdues ?</strong> Les informations ne sont pas sauvegardées automatiquement. Remplissez, puis téléchargez le PDF tout de suite !</p>
+                <p><strong>Problème de PDF ?</strong> Actualisez la page (F5 ou Ctrl+R) et réessayez. Attention : cela efface ce que vous avez rempli.</p>
+                <p><strong>Rien n'est sauvegardé :</strong> Si vous fermez ou actualisez la page, tout est perdu. Remplissez, puis téléchargez le PDF tout de suite !</p>
             </div>
         </section>
 
         <footer class="footer">
-            <p>📖 Guide Réunion Résidents - Version 1.0</p>
+            <p>📖 Guide Réunion Résidents - Version 1.1</p>
             <p>Pour toute question, contactez votre responsable</p>
         </footer>
     </div>
