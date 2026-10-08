@@ -157,12 +157,12 @@
 
         .btn-actions {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 0.8rem;
-            margin-top: 1rem;
+            margin: 1rem 0;
         }
 
-        .btn-print, .btn-pdf, .btn-translate {
+        .btn-print, .btn-pdf {
             padding: 0.8rem 1rem;
             color: white;
             border: none;
@@ -176,10 +176,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
-        .btn-translate {
-            background: linear-gradient(135deg, #4ECDC4 0%, #45B7D1 100%);
-        }
-
         button:disabled {
             background: #ccc !important;
             opacity: 0.6;
@@ -190,7 +186,7 @@
             transform: none !important;
         }
 
-        .btn-print:hover, .btn-pdf:hover, .btn-translate:hover {
+        .btn-print:hover, .btn-pdf:hover {
             transform: scale(1.02);
         }
 
@@ -533,7 +529,6 @@
             <h2>👁️ Aperçu</h2>
             <div class="btn-actions">
                 <button class="btn-pdf" onclick="telechargerPDF()">📥 PDF</button>
-                <button class="btn-translate" onclick="basculerGeorgien()" id="btn-translate" disabled>🇬🇪 Géorgien</button>
             </div>
             <div id="preview" class="preview-container"></div>
         </div>
@@ -541,7 +536,6 @@
 
     <script>
         // Configuration
-        let estEnGeorgien = false;
         let themes = [];
 
         const couleursThemes = [
@@ -561,16 +555,6 @@
             '🏠 Logement': ['🏠', '🏡', '🛏️', '🧹', '🧺', '🪟', '🚪', '🛋️'],
             '💼 Travail': ['💼', '📋', '📝', '💻', '📱', '🤝', '🎓', '👔']
         };
-
-        const traductionsGeo = {
-            'RÉUNION RÉSIDENTS !': 'მოსახლეობის შეკრება !',
-            'Au programme de cette réunion 👇': 'დღევანდელი აგენდა 👇',
-            'Ne manquez pas cette réunion importante !': 'ამ მნიშვნელოვანი შეკრების გამოტოვება აკრძალულია !'
-        };
-
-        function traduire(texte) {
-            return traductionsGeo[texte] || texte;
-        }
 
         function renderEmojis() {
             const palette = document.getElementById('emoji-palette');
@@ -625,11 +609,11 @@
                 
                 div.innerHTML = `
                     <div class="theme-header">
-                        <input type="text" class="theme-emoji" value="${theme.emoji}" maxlength="2" onchange="themes[${index}].emoji = this.value; saveThemes(); renderPreview();">
+                        <input type="text" class="theme-emoji" value="${theme.emoji}" maxlength="8" oninput="themes[${index}].emoji = this.value; saveThemes(); renderPreview();">
                         <button class="btn-remove" type="button" onclick="themes.splice(${index}, 1); saveThemes(); renderThemes(); renderPreview(); updateAddButton();">Retirer</button>
                     </div>
-                    <input type="text" value="${theme.titre}" placeholder="Titre du thème" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.6rem; font-size: 0.9rem;" onchange="themes[${index}].titre = this.value; saveThemes(); renderPreview();">
-                    <input type="text" value="${theme.desc}" placeholder="Description" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;" onchange="themes[${index}].desc = this.value; saveThemes(); renderPreview();">
+                    <input type="text" value="${theme.titre}" placeholder="Titre du thème" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.6rem; font-size: 0.9rem;" oninput="themes[${index}].titre = this.value; saveThemes(); renderPreview();">
+                    <input type="text" value="${theme.desc}" placeholder="Description" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;" oninput="themes[${index}].desc = this.value; saveThemes(); renderPreview();">
                 `;
                 
                 container.appendChild(div);
@@ -659,31 +643,17 @@
         }
 
         function renderPreview() {
-            let date = document.getElementById('date').value;
-            let titre = document.getElementById('titre').value;
-            let soustitre = document.getElementById('soustitre').value;
-            
-            if (estEnGeorgien) {
-                date = traduire(date) || date;
-                titre = traduire(titre) || titre;
-                soustitre = traduire(soustitre) || soustitre;
-            }
-            
+            const date = document.getElementById('date').value;
+            const titre = document.getElementById('titre').value;
+            const soustitre = document.getElementById('soustitre').value;
+
             let themesHTML = '';
             themes.forEach(t => {
-                let themeTitre = t.titre;
-                let themeDesc = t.desc;
-                
-                if (estEnGeorgien) {
-                    themeTitre = traduire(themeTitre) || themeTitre;
-                    themeDesc = traduire(themeDesc) || themeDesc;
-                }
-                
                 themesHTML += `
                     <div class="theme-card" style="background: ${t.couleur};">
                         <div class="theme-card-icon">${t.emoji}</div>
-                        <h3>${themeTitre}</h3>
-                        <p>${themeDesc}</p>
+                        <h3>${t.titre}</h3>
+                        <p>${t.desc}</p>
                     </div>
                 `;
             });
@@ -694,10 +664,7 @@
                     <p style="color: #999; text-align: center;">Ajoutez des thèmes pour voir l'aperçu 👈</p>
                 </div>`;
 
-            let footerText = 'Ne manquez pas cette réunion importante ! 🎯';
-            if (estEnGeorgien) {
-                footerText = traduire(footerText) || footerText;
-            }
+            const footerText = 'Ne manquez pas cette réunion importante ! 🎯';
 
             const html = `
                 <div style="display: flex; flex-direction: column; background: white; height: 210mm; min-height: 210mm;">
@@ -711,27 +678,14 @@
                     <div style="flex: 1; padding: 2rem; background: white; display: flex; flex-direction: column; overflow-y: auto;">
                         ${themesSection}
                     </div>
+                    <div class="preview-footer">
+                        <p>${footerText}</p>
+                    </div>
                 </div>
             `;
             
             document.getElementById('preview').innerHTML = html;
         }
-
-        function basculerGeorgien() {
-            estEnGeorgien = !estEnGeorgien;
-            const btn = document.getElementById('btn-translate');
-            
-            if (estEnGeorgien) {
-                btn.style.background = 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)';
-                btn.innerHTML = '🇫🇷 Français';
-            } else {
-                btn.style.background = 'linear-gradient(135deg, #4ECDC4 0%, #45B7D1 100%)';
-                btn.innerHTML = '🇬🇪 Géorgien';
-            }
-            
-            renderPreview();
-        }
-
 
         function telechargerPDF() {
             const titre = document.getElementById('titre').value || 'Affiche-Reunion';
