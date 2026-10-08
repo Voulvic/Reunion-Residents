@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur d'Affiche Réunion Résidents</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <title>Guide - Réunion Résidents</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-        
         * {
             margin: 0;
             padding: 0;
@@ -17,9 +17,17 @@
         body {
             font-family: 'Poppins', 'Arial', sans-serif;
             background: #f5f5f5;
-            padding: 2rem;
+            padding: 2rem 1rem;
+            color: #333;
+            line-height: 1.6;
         }
 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* En-tête (même style que les autres pages) */
         .header {
             text-align: center;
             margin-bottom: 2rem;
@@ -36,704 +44,399 @@
             font-size: 0.95rem;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+        /* Navigation (même style que les autres pages) */
+        .nav-buttons {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .panel {
+        .nav-btn {
+            padding: 0.8rem 1.5rem;
+            margin: 0.25rem 0.5rem;
+            background: #4facfe;
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            background: #2e8fd6;
+            text-decoration: none;
+        }
+
+        .nav-btn.active {
+            background: #667eea;
+        }
+
+        /* Sommaire des formats */
+        .formats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .format-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .format-card .icon {
+            font-size: 2rem;
+        }
+
+        .format-card .name {
+            font-weight: 600;
+            margin: 0.3rem 0;
+        }
+
+        .format-card .badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #eef0fd;
+            color: #4f5bd5;
+        }
+
+        /* Sections */
+        .guide-section {
             background: white;
             padding: 2rem;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .panel-left {
-            height: fit-content;
-        }
-
-        .panel-right {
-            position: sticky;
-            top: 2rem;
-            height: auto;
-            max-height: none;
-        }
-
-        h2 {
+        .guide-section h2 {
             font-size: 1.5rem;
-            color: #333;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid #4facfe;
-            padding-bottom: 0.8rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #333;
-            font-size: 0.95rem;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #4facfe;
-            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
-        }
-
-        .theme-item {
-            padding: 1rem;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
             margin-bottom: 1rem;
-        }
-
-        .theme-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.8rem;
-        }
-
-        .theme-emoji {
-            width: 60px;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: center;
-            font-size: 1.5rem;
-        }
-
-        .btn-remove {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        .btn-remove:hover {
-            background: #ff5252;
-        }
-
-        .btn-add {
-            width: 100%;
-            padding: 0.8rem;
-            background: #4facfe;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.95rem;
-        }
-
-        .btn-add:hover {
-            background: #2e8fd6;
-        }
-
-        .btn-add:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .btn-actions {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.8rem;
-            margin: 1rem 0;
-        }
-
-        .btn-print, .btn-pdf {
-            padding: 0.8rem 1rem;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .btn-pdf {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        button:disabled {
-            background: #ccc !important;
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        button:disabled:hover {
-            transform: none !important;
-        }
-
-        .btn-print:hover, .btn-pdf:hover {
-            transform: scale(1.02);
-        }
-
-        .divider {
-            margin: 1.5rem 0;
-            border: none;
-            border-top: 1px solid #eee;
-        }
-
-        .preview-container {
-            background: white;
-            border-radius: 0;
-            overflow: visible;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            flex-direction: column;
-            height: auto;
-        }
-
-        .preview-header {
-            background: linear-gradient(90deg, #FF6B6B 0%, #FF8E53 25%, #FFC93D 50%, #4ECDC4 75%, #45B7D1 100%);
-            padding: 0.4rem 1.2rem;
-            text-align: center;
-            color: black;
-            overflow: visible;
-            border-radius: 0;
-        }
-
-        .preview-header-icon {
-            font-size: 1.8rem;
-            margin: 0;
-            padding: 0;
-            line-height: 1;
-            display: block;
-        }
-
-        .preview-header h1 {
-            font-size: 1.6rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin: 0.1rem 0 0 0;
-            padding: 0;
-        }
-
-        .preview-header p {
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin: 0.1rem 0 0 0;
-            padding: 0;
-        }
-
-        .preview-subtitle {
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.95rem;
-            color: black;
-            font-style: italic;
-            font-weight: 500;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .preview-themes {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.2rem;
-            padding: 1.2rem;
-            justify-content: center;
-        }
-
-        .theme-card {
-            padding: 1rem;
-            border-radius: 10px;
-            color: black;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .theme-card-icon {
-            font-size: 1.8rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .theme-card h3 {
-            margin: 0 0 0.2rem 0;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        .theme-card p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.95;
-        }
-
-        .preview-footer {
-            background: #f8f9fa;
-            padding: 0.8rem;
-            text-align: center;
-            border-left: 5px solid #FF6B6B;
-        }
-
-        .preview-footer p {
-            margin: 0;
-            font-size: 0.8rem;
-            color: black;
-            font-weight: 500;
-        }
-
-        .emoji-btn {
-            aspect-ratio: 1;
-            background: #f9f9f9;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .emoji-btn:hover {
-            background: #f0f0f0;
-            border-color: #4facfe;
-            transform: scale(1.1);
-        }
-
-        .emoji-category-title {
-            grid-column: 1 / -1;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #333;
-            border-bottom: 1px solid #e0e0e0;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
             padding-bottom: 0.5rem;
         }
 
-        .empty-themes {
+        .guide-section h3 {
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Étapes */
+        .step {
+            background: #f9f9f9;
             padding: 1rem;
-            background: #f0f7ff;
-            border: 1px solid #4facfe;
-            border-radius: 6px;
-            color: #666;
+            margin: 1rem 0;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .step-number {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .step p {
+            margin: 0.5rem 0;
+        }
+
+        .step ul {
+            margin: 0.5rem 0 0.5rem 2rem;
+        }
+
+        /* Encadrés */
+        .tips {
+            background: #f0f8ff;
+            padding: 1rem;
+            border-left: 4px solid #4ECDC4;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .tips p + p {
+            margin-top: 0.5rem;
+        }
+
+        .tips strong {
+            color: #2a9d95;
+        }
+
+        .example {
+            background: #fff9e6;
+            padding: 1rem;
+            border-left: 4px solid #FFC93D;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .example strong {
+            color: #e07a2f;
+        }
+
+        .footer {
             text-align: center;
+            color: #999;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
             font-size: 0.9rem;
         }
 
-        @media (max-width: 1024px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-
-            .panel-right {
-                position: relative;
-                top: 0;
-            }
-
-            .preview-header h1 {
-                font-size: 2rem;
-            }
-
-            .preview-themes {
-                grid-template-columns: 1fr;
-            }
-
-            .btn-actions {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Dans le PDF, toujours 3 thèmes par ligne, même sur petit écran */
-        .copie-pdf .preview-themes {
-            grid-template-columns: 1fr 1fr 1fr !important;
-        }
-
-        @media print {
-            * {
-                margin: 0;
-                padding: 0;
-            }
-
-            html, body {
-                width: 297mm;
-                height: 210mm;
-                padding: 0;
-                margin: 0;
-                background: white;
-            }
-
+        /* Mobile */
+        @media (max-width: 700px) {
             body {
-                padding: 0;
-                margin: 0;
+                padding: 1rem;
             }
 
-            .header, .container {
-                display: none !important;
+            .header h1 {
+                font-size: 1.6rem;
             }
 
-            .preview-container {
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                width: 297mm !important;
-                height: auto !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                display: flex !important;
-                flex-direction: column !important;
-                overflow: hidden !important;
+            .formats {
+                grid-template-columns: 1fr;
             }
 
-            .preview-header {
-                padding: 2mm 6mm !important;
-                flex-shrink: 0;
-                margin: 0 !important;
-                border-radius: 0 !important;
-            }
-
-            .preview-header h1 {
-                font-size: 22px !important;
-                margin: 0px 0 0 0 !important;
-                line-height: 1 !important;
-            }
-
-            .preview-header p {
-                font-size: 10px !important;
-                margin: 0px 0 0 0 !important;
-            }
-
-            .preview-header-icon {
-                font-size: 20px !important;
-                margin: 0 !important;
-            }
-
-            .preview-subtitle {
-                padding: 6mm 8mm !important;
-                font-size: 13px !important;
-                flex-shrink: 0;
-                margin: 0 !important;
-            }
-
-            .preview-themes {
-                grid-template-columns: 1fr 1fr 1fr !important;
-                grid-auto-rows: minmax(30mm, 1fr) !important;
-                gap: 6mm !important;
-                padding: 8mm 8mm !important;
-                margin: 0 !important;
-            }
-
-            .theme-card {
-                padding: 8mm !important;
-                border-radius: 8px !important;
-                margin: 0 !important;
-                display: flex !important;
-                flex-direction: column !important;
-                overflow: hidden !important;
-                color: black !important;
-                page-break-inside: avoid !important;
-            }
-
-            .theme-card-icon {
-                font-size: 28px !important;
-                margin-bottom: 3px !important;
-                line-height: 1 !important;
-            }
-
-            .theme-card h3 {
-                font-size: 13px !important;
-                margin: 0 0 2px 0 !important;
-                font-weight: bold !important;
-                line-height: 1.1 !important;
-            }
-
-            .theme-card p {
-                font-size: 10px !important;
-                margin: 0 !important;
-                line-height: 1 !important;
-            }
-
-            .preview-footer {
-                padding: 6mm 8mm !important;
-                flex-shrink: 0;
-                margin: 0 !important;
-            }
-
-            .preview-footer p {
-                font-size: 11px !important;
-                margin: 0 !important;
-            }
-
-            @page {
-                size: A4 landscape;
-                margin: 0;
+            .guide-section {
+                padding: 1.25rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🎤 Générateur d'Affiche Réunion</h1>
-        <p>Personnalisez votre affiche pour chaque réunion résidents</p>
+        <h1>📖 Guide d'utilisation</h1>
+        <p>Comment utiliser les outils de la réunion résidents</p>
     </div>
 
-    <div style="text-align: center; margin-bottom: 2rem;">
-        <a href="index.html" style="padding: 0.8rem 1.5rem; margin: 0 0.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block;">🎤 Affiche Réunion</a>
-        <a href="compte-rendu.html" style="padding: 0.8rem 1.5rem; margin: 0 0.5rem; background: #4facfe; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block;">📋 Compte-Rendu</a>
-        <a href="fiche-avis.html" style="padding: 0.8rem 1.5rem; margin: 0 0.5rem; background: #4facfe; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block;">📝 Fiche d'Avis</a>
-        <a href="guide.html" style="padding: 0.8rem 1.5rem; margin: 0 0.5rem; background: #4facfe; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block;">📖 Guide</a>
-    </div>
+    <nav class="nav-buttons">
+        <a href="affiche.html" class="nav-btn">🎤 Affiche Réunion</a>
+        <a href="compte-rendu.html" class="nav-btn">📋 Compte-Rendu</a>
+        <a href="fiche-avis.html" class="nav-btn">📝 Fiche d'Avis</a>
+        <a href="index.html" class="nav-btn active">📖 Guide</a>
+    </nav>
 
     <div class="container">
-        <!-- FORMULAIRE À GAUCHE -->
-        <div class="panel panel-left">
-            <h2>⚙️ Personnalisez</h2>
-            
-            <div class="form-group">
-                <label for="date" style="font-weight: 700; color: black;">📅 Date et Heure</label>
-                <input type="text" id="date" value="" placeholder="Ex: DEMAIN À 13H">
+
+        <!-- Résumé des formats -->
+        <div class="formats">
+            <div class="format-card">
+                <div class="icon">🎤</div>
+                <div class="name">Affiche Réunion</div>
+                <span class="badge">A4 paysage</span>
             </div>
-
-            <div class="form-group">
-                <label for="titre" style="font-weight: 700; color: black;">📝 Titre principal</label>
-                <input type="text" id="titre" value="" placeholder="Ex: RÉUNION RÉSIDENTS !">
+            <div class="format-card">
+                <div class="icon">📋</div>
+                <div class="name">Compte-Rendu</div>
+                <span class="badge">A4 portrait</span>
             </div>
-
-            <div class="form-group">
-                <label for="soustitre">Sous-titre</label>
-                <input type="text" id="soustitre" value="" placeholder="Ex: Au programme de cette réunion 👇">
+            <div class="format-card">
+                <div class="icon">📝</div>
+                <div class="name">Fiche d'Avis</div>
+                <span class="badge">A4 portrait · 2 pages</span>
             </div>
-
-            <hr class="divider">
-
-            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Thèmes (max 6)</h3>
-            <div id="themes-container"></div>
-
-            <button class="btn-add" id="btn-add" onclick="ajouterTheme()">+ Ajouter un thème</button>
-
-            <hr class="divider">
-
-            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">🎨 Emojis disponibles</h3>
-            <p style="font-size: 0.85rem; color: #666; margin: 0 0 1rem 0;">Cliquez pour copier</p>
-            <div id="emoji-palette" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem;"></div>
         </div>
 
-        <!-- APERÇU À DROITE -->
-        <div class="panel panel-right">
-            <h2>👁️ Aperçu</h2>
-            <div class="btn-actions">
-                <button class="btn-pdf" onclick="telechargerPDF()">📥 PDF</button>
+        <!-- ========== Affiche Réunion ========== -->
+        <section class="guide-section">
+            <h2>🎤 1. Affiche Réunion</h2>
+
+            <h3>À quoi ça sert ?</h3>
+            <p>L'affiche de réunion vous permet de créer une belle affiche colorée pour annoncer la réunion aux résidents. C'est parfait pour l'imprimer et l'afficher dans le réfectoire !</p>
+
+            <h3>Comment l'utiliser - Étapes simples :</h3>
+
+            <div class="step">
+                <div class="step-number">Étape 1 : Date, titre et sous-titre</div>
+                <p>Dans le formulaire de gauche, remplissez :</p>
+                <ul>
+                    <li><strong>Date et heure</strong> (ex : « Demain à 13h »)</li>
+                    <li><strong>Titre principal</strong> (ex : « Réunion résidents ! »)</li>
+                    <li><strong>Sous-titre</strong> (ex : « Au programme de cette réunion 👇 »)</li>
+                </ul>
             </div>
-            <div id="preview" class="preview-container"></div>
-        </div>
+
+            <div class="step">
+                <div class="step-number">Étape 2 : Ajouter les thèmes</div>
+                <p>Cliquez sur « + Ajouter un thème » pour chaque sujet de la réunion. Chaque thème apparaît sur l'affiche dans une carte de couleur différente.</p>
+                <p>Pour chaque thème, remplissez :</p>
+                <ul>
+                    <li><strong>L'emoji</strong> (dans la petite case en haut à gauche)</li>
+                    <li><strong>Le titre du thème</strong> (ex : « Bien-être », « Activités »)</li>
+                    <li><strong>Une courte description</strong></li>
+                </ul>
+                <p>Le bouton « Retirer » supprime un thème. <strong>Vous pouvez ajouter jusqu'à 6 thèmes.</strong></p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 3 : Choisir un emoji</div>
+                <p>En bas du formulaire, une palette d'emojis est classée par catégorie (Hygiène, Repas, Activités, Santé).</p>
+                <p>Cliquez sur un emoji pour le copier, puis collez-le (Ctrl+V) dans la case emoji du thème.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 4 : Voir l'aperçu</div>
+                <p>À droite de l'écran, vous voyez à quoi va ressembler l'affiche. L'aperçu se met à jour dès que vous modifiez un champ.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 5 : Télécharger en PDF</div>
+                <p>Quand tout est prêt, cliquez sur le bouton « 📥 PDF » pour télécharger l'affiche.</p>
+                <p>L'affiche est au format <strong>A4 paysage</strong>, prête à imprimer !</p>
+            </div>
+
+            <div class="tips">
+                <strong>💡 Conseil :</strong> Utilisez des emojis variés et des titres courts pour rendre l'affiche plus attrayante et facile à lire de loin.
+            </div>
+
+            <div class="example">
+                <strong>📌 Exemple d'affiche :</strong> Date : « Mardi 20 janvier à 14h » | Thèmes : « 🍽️ Repas », « 🎨 Activités »
+            </div>
+        </section>
+
+        <!-- ========== Compte-Rendu ========== -->
+        <section class="guide-section">
+            <h2>📋 2. Compte-Rendu</h2>
+
+            <h3>À quoi ça sert ?</h3>
+            <p>Le compte-rendu permet de garder une trace écrite de ce qui s'est dit pendant la réunion.</p>
+
+            <h3>Comment l'utiliser - Étapes simples :</h3>
+
+            <div class="step">
+                <div class="step-number">Étape 1 : Informations générales</div>
+                <p>Remplissez d'abord les informations de base :</p>
+                <ul>
+                    <li><strong>Date de la réunion</strong> (cliquez dans le champ pour choisir la date dans le calendrier)</li>
+                    <li><strong>Résidents présents</strong> (les noms, un par ligne si vous voulez)</li>
+                    <li><strong>Professionnels présents</strong> (les noms, un par ligne si vous voulez)</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 2 : Remplir les sections</div>
+                <p><strong>5 sections vides</strong> sont déjà prêtes : une par thème abordé. Si besoin, cliquez sur « + Ajouter une section » pour en ajouter, ou sur « Retirer » pour supprimer celles qui ne servent pas.</p>
+                <p>Chaque section contient trois champs :</p>
+                <ul>
+                    <li><strong>Le titre du thème</strong> (ex : « Activités du mois »)</li>
+                    <li><strong>Le premier cadre</strong> : ce qui a été présenté, les décisions prises</li>
+                    <li><strong>Le second cadre</strong> : les remarques, propositions et échanges des résidents</li>
+                </ul>
+                <p>Un cadre laissé vide n'apparaît pas sur le compte-rendu.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 3 : Voir l'aperçu</div>
+                <p>L'aperçu à droite montre le compte-rendu tel qu'il sera imprimé. Il se met à jour pendant que vous écrivez.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 4 : Imprimer ou télécharger en PDF</div>
+                <p>Cliquez sur « 🖨️ Imprimer » pour l'imprimer directement, ou sur « 📥 PDF » pour le télécharger et l'archiver.</p>
+                <p>Le compte-rendu est au format <strong>A4 portrait</strong>.</p>
+            </div>
+
+            <div class="tips">
+                <strong>💡 Conseil :</strong> Soyez clair et concis, évitez les textes trop longs. Le compte-rendu doit être facile à lire et à comprendre.
+            </div>
+
+            <div class="example">
+                <strong>📌 Exemple :</strong> Thème : « Menus de la semaine » | Premier cadre : « Présentation des menus du 20 au 24 janvier » | Second cadre : « Les résidents aimeraient plus de fruits frais »
+            </div>
+        </section>
+
+        <!-- ========== Fiche d'Avis ========== -->
+        <section class="guide-section">
+            <h2>📝 3. Fiche d'Avis</h2>
+
+            <h3>À quoi ça sert ?</h3>
+            <p>La fiche d'avis permet de recueillir facilement les opinions, suggestions et idées des résidents. C'est un formulaire simple qu'ils peuvent remplir après la réunion, avec ou sans leur nom.</p>
+
+            <h3>Comment l'utiliser - Étapes simples :</h3>
+
+            <div class="step">
+                <div class="step-number">Étape 1 : Remplir les informations de base</div>
+                <ul>
+                    <li><strong>Date de la réunion</strong> (cliquez dans le champ pour choisir la date)</li>
+                    <li><strong>Phrase d'introduction</strong> : un texte est déjà proposé, vous pouvez le modifier si vous le souhaitez</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 2 : Ajouter les sujets évoqués lors de la réunion</div>
+                <p>Cliquez sur « + Ajouter une option » pour chaque sujet abordé pendant la réunion, puis écrivez son nom.</p>
+                <p>Sur la fiche, les sujets apparaissent sous forme de cases à cocher à la question <em>« Quel sujet vous a le plus intéressé ? »</em>, suivie de lignes pour expliquer pourquoi.</p>
+                <p>Si vous n'ajoutez aucun sujet, cette partie n'apparaît pas sur la fiche.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 3 : Voir l'aperçu</div>
+                <p>À droite, l'aperçu montre la fiche telle qu'elle sera imprimée.</p>
+                <p>En plus de vos sujets, la fiche contient déjà automatiquement :</p>
+                <ul>
+                    <li>Un avis général sur la réunion (de « Très intéressante » à « Peu intéressante »)</li>
+                    <li>Un espace pour les remarques</li>
+                    <li>Un espace pour les idées d'activités, de sorties ou de repas</li>
+                    <li>Un espace pour proposer des sujets pour la prochaine réunion</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 4 : Imprimer ou télécharger en PDF</div>
+                <p>Cliquez sur « 🖨️ Imprimer » ou sur « 📥 PDF ».</p>
+                <p>La fiche est au format <strong>A4 portrait, sur 2 pages</strong> : pensez à l'imprimer en recto-verso. Imprimez autant de copies que nécessaire et distribuez-les aux résidents.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">Étape 5 : Faire remplir et récupérer</div>
+                <p>Les résidents remplissent la fiche avec leurs avis et suggestions, puis vous la récupérez <strong>au plus tard le lendemain de la réunion</strong>.</p>
+                <p>Cela vous donne des retours précieux pour améliorer le quotidien et préparer la prochaine réunion !</p>
+            </div>
+
+            <div class="tips">
+                <strong>💡 Conseil :</strong> Reprenez les mêmes sujets que sur l'affiche de la réunion, pour que les résidents s'y retrouvent facilement.
+            </div>
+
+            <div class="example">
+                <strong>📌 Exemple :</strong> Date : « 18/01/2025 » | Sujets : « Activités », « Repas », « Ménage des chambres »
+            </div>
+        </section>
+
+        <!-- ========== Conseils généraux ========== -->
+        <section class="guide-section">
+            <h2>✨ Conseils généraux</h2>
+
+            <h3>Pour l'impression :</h3>
+            <div class="tips">
+                <p><strong>Format :</strong> L'affiche est en A4 paysage. Le compte-rendu et la fiche d'avis sont en A4 portrait.</p>
+                <p><strong>Imprimante :</strong> Utilisez une imprimante couleur pour un plus beau résultat, surtout pour l'affiche.</p>
+                <p><strong>Marges :</strong> Les documents sont déjà mis en page, n'ajoutez pas de marges supplémentaires.</p>
+            </div>
+
+            <h3>Pour les données :</h3>
+            <div class="tips">
+                <p><strong>Modification facile :</strong> Vous pouvez modifier vos informations à tout moment avant de télécharger, l'aperçu suit vos changements.</p>            </div>
+
+            <h3>Si quelque chose ne va pas :</h3>
+            <div class="tips">
+                <p><strong>Problème de PDF ?</strong> Actualisez la page (F5 ou Ctrl+R) et réessayez. Attention : cela efface ce que vous avez rempli.</p>
+                <p><strong>Rien n'est sauvegardé :</strong> Si vous fermez ou actualisez la page, tout est perdu. Remplissez, puis téléchargez le PDF tout de suite !</p>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>📖 Guide Réunion Résidents - Version 1.1</p>
+            <p>Pour toute question, voir avec Dany</p>
+        </footer>
     </div>
-
-    <script>
-        // Configuration
-        let themes = [];
-
-        const couleursThemes = [
-            'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
-            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-            'linear-gradient(135deg, #30b0fe 0%, #5fc7eb 100%)'
-        ];
-
-        const emojiCategories = {
-            '🧼 Hygiène': ['🧼', '🛁', '🧴', '🧷', '🧻', '💅', '💇', '🪥', '🚿'],
-            '🍽️ Repas': ['🍽️', '👨‍🍳', '🍳', '🥘', '🍲', '🍝', '🥗', '🍎', '🥕'],
-            '🎨 Activités': ['🎨', '🎭', '🎬', '🎮', '📚', '📖', '⚽', '🏀', '🎾'],
-            '💊 Santé': ['💊', '🏥', '🩺', '💉', '🔬', '👨‍⚕️', '😷', '🤒'],
-            '🏠 Logement': ['🏠', '🏡', '🛏️', '🧹', '🧺', '🪟', '🚪', '🛋️'],
-            '💼 Travail': ['💼', '📋', '📝', '💻', '📱', '🤝', '🎓', '👔']
-        };
-
-        function renderEmojis() {
-            const palette = document.getElementById('emoji-palette');
-            palette.innerHTML = '';
-            
-            Object.entries(emojiCategories).forEach(([category, emojis]) => {
-                const categoryTitle = document.createElement('div');
-                categoryTitle.className = 'emoji-category-title';
-                categoryTitle.innerHTML = category;
-                palette.appendChild(categoryTitle);
-                
-                emojis.forEach(emoji => {
-                    const btn = document.createElement('button');
-                    btn.className = 'emoji-btn';
-                    btn.innerHTML = emoji;
-                    btn.type = 'button';
-                    btn.onclick = (e) => {
-                        e.preventDefault();
-                        navigator.clipboard.writeText(emoji).then(() => {
-                            btn.style.background = '#4facfe';
-                            btn.style.color = 'white';
-                            setTimeout(() => {
-                                btn.style.background = '#f9f9f9';
-                                btn.style.color = 'inherit';
-                            }, 200);
-                        });
-                    };
-                    palette.appendChild(btn);
-                });
-            });
-        }
-
-        function saveThemes() {
-            localStorage.setItem('lhss_themes', JSON.stringify(themes));
-        }
-
-        function renderThemes() {
-            const container = document.getElementById('themes-container');
-            container.innerHTML = '';
-            
-            if (themes.length === 0) {
-                const emptyMsg = document.createElement('div');
-                emptyMsg.className = 'empty-themes';
-                emptyMsg.innerHTML = '📝 Cliquez sur "+ Ajouter un thème" pour commencer';
-                container.appendChild(emptyMsg);
-                return;
-            }
-            
-            themes.forEach((theme, index) => {
-                const div = document.createElement('div');
-                div.className = 'theme-item';
-                
-                div.innerHTML = `
-                    <div class="theme-header">
-                        <input type="text" class="theme-emoji" value="${theme.emoji}" maxlength="8" oninput="themes[${index}].emoji = this.value; saveThemes(); renderPreview();">
-                        <button class="btn-remove" type="button" onclick="themes.splice(${index}, 1); saveThemes(); renderThemes(); renderPreview(); updateAddButton();">Retirer</button>
-                    </div>
-                    <input type="text" value="${theme.titre}" placeholder="Titre du thème" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.6rem; font-size: 0.9rem;" oninput="themes[${index}].titre = this.value; saveThemes(); renderPreview();">
-                    <input type="text" value="${theme.desc}" placeholder="Description" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;" oninput="themes[${index}].desc = this.value; saveThemes(); renderPreview();">
-                `;
-                
-                container.appendChild(div);
-            });
-
-            updateAddButton();
-        }
-
-        function updateAddButton() {
-            const btn = document.getElementById('btn-add');
-            btn.disabled = themes.length >= 6;
-        }
-
-        function ajouterTheme() {
-            if (themes.length < 6) {
-                const couleurIndex = themes.length % couleursThemes.length;
-                themes.push({ 
-                    emoji: '⭐', 
-                    titre: 'Nouveau thème', 
-                    desc: 'Description', 
-                    couleur: couleursThemes[couleurIndex]
-                });
-                saveThemes();
-                renderThemes();
-                renderPreview();
-            }
-        }
-
-        function renderPreview() {
-            const date = document.getElementById('date').value;
-            const titre = document.getElementById('titre').value;
-            const soustitre = document.getElementById('soustitre').value;
-
-            let themesHTML = '';
-            themes.forEach(t => {
-                themesHTML += `
-                    <div class="theme-card" style="background: ${t.couleur};">
-                        <div class="theme-card-icon">${t.emoji}</div>
-                        <h3>${t.titre}</h3>
-                        <p>${t.desc}</p>
-                    </div>
-                `;
-            });
-
-            const themesSection = themes.length > 0 ? 
-                `<div class="preview-themes">${themesHTML}</div>` :
-                `<div class="preview-themes" style="display: flex; align-items: center; justify-content: center; min-height: 150px; background: #f9f9f9;">
-                    <p style="color: #999; text-align: center;">Ajoutez des thèmes pour voir l'aperçu 👈</p>
-                </div>`;
-
-            const footerText = 'Ne manquez pas cette réunion importante ! 🎯';
-
-            const html = `
-                <div style="display: flex; flex-direction: column; background: white; height: 210mm; min-height: 210mm;">
-                    <div style="padding: 2rem 2rem 1rem 2rem; background: white; text-align: center; border-bottom: 0.5px solid #eee;">
-                        <div>
-                            <p style="font-size: 18px; font-weight: 700; color: black; margin: 0;">${titre || 'Titre'}</p>
-                            <p style="font-size: 14px; font-weight: 700; color: black; margin: 0.5rem 0 0 0;">${date || 'Date'}</p>
-                            <p style="font-size: 13px; color: #666; margin: 0.8rem 0 0 0;">${soustitre || 'Sous-titre'}</p>
-                        </div>
-                    </div>
-                    <div style="flex: 1; padding: 2rem; background: white; display: flex; flex-direction: column; overflow-y: auto;">
-                        ${themesSection}
-                    </div>
-                    <div class="preview-footer">
-                        <p>${footerText}</p>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('preview').innerHTML = html;
-        }
-
-        function telechargerPDF() {
-            const titre = document.getElementById('titre').value || 'Affiche-Reunion';
-            const element = document.getElementById('preview');
-            
-            const opt = {
-                margin: 0,
-                filename: titre + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                jsPDF: { format: 'a4', orientation: 'landscape' }
-            };
-            
-            genererPDF(element, opt, 1123);
-        }
-
-        // Génère le PDF à partir d'une copie de l'aperçu placée en haut de la page,
-        // à la largeur exacte d'une feuille A4 : évite le grand blanc en haut du PDF
-        // quand l'aperçu est plus bas sur la page (petit écran, page défilée...).
-        function genererPDF(element, opt, largeurPx) {
-            const zone = document.createElement('div');
-            zone.style.cssText = 'position:absolute; top:0; left:0; z-index:-1; background:white; width:' + largeurPx + 'px;';
-            const copie = element.cloneNode(true);
-            copie.removeAttribute('id');
-            copie.classList.add('copie-pdf');
-            copie.style.boxShadow = 'none';
-            copie.style.borderRadius = '0';
-            copie.style.width = '100%';
-            zone.appendChild(copie);
-            document.body.appendChild(zone);
-
-            opt.html2canvas = Object.assign({ scale: 2, scrollX: 0, scrollY: 0 }, opt.html2canvas || {});
-            return html2pdf().set(opt).from(copie).save().finally(() => zone.remove());
-        }
-
-        // Initialisation
-        document.getElementById('date').addEventListener('input', () => renderPreview());
-        document.getElementById('titre').addEventListener('input', () => renderPreview());
-        document.getElementById('soustitre').addEventListener('input', () => renderPreview());
-
-        renderThemes();
-        updateAddButton();
-        renderEmojis();
-        renderPreview();
-    </script>
 </body>
 </html>
