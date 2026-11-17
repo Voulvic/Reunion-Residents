@@ -354,6 +354,10 @@
             cursor: zoom-in;
         }
 
+        #zone-impression {
+            display: none;
+        }
+
         #lightbox {
             display: none;
             position: fixed;
@@ -394,8 +398,13 @@
                 margin: 0;
             }
 
-            .header, .container, .nav-buttons, #lightbox {
+            /* On n'imprime que la copie de l'aperçu (#zone-impression) */
+            body > *:not(#zone-impression):not(.zone-mesure) {
                 display: none !important;
+            }
+
+            #zone-impression {
+                display: block !important;
             }
 
             .preview-container {
@@ -405,7 +414,16 @@
                 padding: 0.8rem !important;
             }
 
+            /* Une section peut passer d'une page à l'autre, mais pas ses blocs de texte ni ses photos */
             .preview-section {
+                page-break-inside: auto !important;
+            }
+
+            .preview-section h3 {
+                page-break-after: avoid;
+            }
+
+            .preview-section-content, .preview-photos {
                 page-break-inside: avoid !important;
             }
 
@@ -637,9 +655,10 @@
 
         // Renvoie le facteur k (>= 1) : on met en page l'aperçu k fois plus large,
         // donc tout apparaît k fois plus petit une fois ramené à la largeur de la feuille.
-        function facteurReduction(largeurBase, hauteurPage) {
-            const cible = hauteurPage * 2 * 0.95; // 5 % de marge de sécurité
+        function facteurReduction(largeurBase, hauteurPage, securite = 0.95) {
+            const cible = hauteurPage * 2 * securite; // marge de sécurité (les sauts de page laissent du vide)
             const zone = document.createElement('div');
+            zone.className = 'zone-mesure';
             zone.style.cssText = 'position:absolute; top:0; left:-10000px; visibility:hidden;';
             const copie = document.getElementById('preview').cloneNode(true);
             copie.removeAttribute('id');
@@ -658,12 +677,22 @@
         }
 
         // Impression : on réduit l'aperçu juste le temps d'imprimer (bouton ou Ctrl+P)
+        // (l'aperçu est dans un bloc masqué à l'impression : on imprime donc une copie)
         window.addEventListener('beforeprint', () => {
-            const k = facteurReduction(LARGEUR_IMPRESSION, HAUTEUR_PAGE_IMPRESSION);
-            if (k > 1) document.getElementById('preview').style.zoom = 1 / k;
+            const k = facteurReduction(LARGEUR_IMPRESSION, HAUTEUR_PAGE_IMPRESSION, 0.88);
+            const ancienne = document.getElementById('zone-impression');
+            if (ancienne) ancienne.remove();
+            const zone = document.createElement('div');
+            zone.id = 'zone-impression';
+            const copie = document.getElementById('preview').cloneNode(true);
+            copie.removeAttribute('id');
+            if (k > 1) copie.style.zoom = 1 / k;
+            zone.appendChild(copie);
+            document.body.appendChild(zone);
         });
         window.addEventListener('afterprint', () => {
-            document.getElementById('preview').style.zoom = '';
+            const zone = document.getElementById('zone-impression');
+            if (zone) zone.remove();
         });
 
         async function telechargerPDF() {
@@ -675,21 +704,61 @@
                 filename: `Compte-rendu_${date}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 jsPDF: { format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'], avoid: '.preview-section' }
+                pagebreak: { mode: ['css'] }
             };
 
             let k = facteurReduction(LARGEUR_PDF, HAUTEUR_PAGE_PDF);
-            let pdf;
+            let resultat;
             // On vérifie le nombre de pages réel et on réduit un peu plus si besoin
             for (let essai = 0; essai < 6; essai++) {
-                pdf = await genererPDF(element, opt, LARGEUR_PDF * k);
-                if (pdf.getNumberOfPages() <= 2 || k >= 2) break;
+                resultat = await genererPDF(element, opt, LARGEUR_PDF * k);
+                if (resultat.pdf.getNumberOfPages() <= 2 || k >= 2) break;
                 k = Math.min(2, k + 0.1);
             }
+            const pdf = resultat.pdf;
             if (pdf.getNumberOfPages() > 2) {
                 alert('Le contenu est trop long pour tenir sur 2 pages, même réduit. Raccourcis un peu les textes ou retire une photo.');
             }
+            await ajouterPagesPhotos(pdf, resultat.photos);
             pdf.save(opt.filename);
+        }
+
+        // Ajoute à la fin du PDF une page par photo (en grand) et rend chaque petite photo
+        // du compte-rendu cliquable : un clic ouvre la page de la photo agrandie,
+        // et un lien « Retour » ramène au compte-rendu.
+        async function ajouterPagesPhotos(pdf, photos) {
+            if (!photos.length) return;
+            const nbPagesCR = pdf.getNumberOfPages();
+
+            const charger = (src) => new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+
+            for (let i = 0; i < photos.length; i++) {
+                const ph = photos[i];
+                const img = await charger(ph.src);
+                pdf.addPage();
+                // Photo ajustée dans une zone de 190 x 240 mm
+                const ratio = Math.min(190 / img.width, 240 / img.height);
+                const w = img.width * ratio;
+                const h = img.height * ratio;
+                pdf.setFontSize(12);
+                pdf.setTextColor(60, 60, 60);
+                pdf.text('Photo ' + (i + 1) + ' sur ' + photos.length + (ph.titre ? ' - ' + ph.titre : ''), 10, 14);
+                pdf.addImage(ph.src, 'JPEG', (210 - w) / 2, 22, w, h);
+                pdf.setTextColor(60, 90, 220);
+                pdf.text('< Retour au compte-rendu', 10, 285);
+                pdf.link(10, 279, 70, 8, { pageNumber: ph.page });
+            }
+
+            // Liens sur les petites photos du compte-rendu
+            photos.forEach((ph, i) => {
+                pdf.setPage(ph.page);
+                pdf.link(ph.x, ph.y, ph.w, ph.h, { pageNumber: nbPagesCR + i + 1 });
+            });
         }
 
         // Génère le PDF à partir d'une copie de l'aperçu placée en haut de la page,
@@ -697,21 +766,65 @@
         // quand l'aperçu est plus bas sur la page (petit écran, page défilée...).
         // Renvoie l'objet PDF (le téléchargement se fait dans telechargerPDF).
         function genererPDF(element, opt, largeurPx) {
+            const k = largeurPx / LARGEUR_PDF; // facteur de réduction (1 = taille normale)
             const zone = document.createElement('div');
-            zone.style.cssText = 'position:absolute; top:0; left:0; z-index:-1; background:white; width:' + largeurPx + 'px;';
+            zone.style.cssText = 'position:absolute; top:0; left:0; z-index:-1; background:white; width:' + LARGEUR_PDF + 'px;';
+
             const copie = element.cloneNode(true);
             copie.removeAttribute('id');
-            copie.classList.add('copie-pdf');
             copie.style.boxShadow = 'none';
             copie.style.borderRadius = '0';
-            copie.style.width = '100%';
-            zone.appendChild(copie);
+            copie.style.width = largeurPx + 'px';
+
+            // Boîte de la taille d'une feuille qui contient la copie réduite
+            const boite = document.createElement('div');
+            boite.style.cssText = 'width:' + LARGEUR_PDF + 'px; overflow:hidden; background:white;';
+            copie.style.transformOrigin = 'top left';
+            copie.style.transform = 'scale(' + (1 / k) + ')';
+            boite.appendChild(copie);
+            zone.appendChild(boite);
             document.body.appendChild(zone);
 
-            opt.html2canvas = Object.assign({ scale: 2, scrollX: 0, scrollY: 0 }, opt.html2canvas || {}, { windowWidth: largeurPx });
+            // Saut de page maison : une section qui ne tient pas en bas d'une page
+            // est décalée en haut de la page suivante (elle n'est jamais coupée en deux)
+            const hPage = HAUTEUR_PAGE_PDF * k; // hauteur d'une page dans le repère de la copie
+            copie.querySelectorAll('.preview-section').forEach(sec => {
+                const cr = copie.getBoundingClientRect();
+                const r = sec.getBoundingClientRect();
+                const haut = (r.top - cr.top) * k;
+                const bas = (r.bottom - cr.top) * k;
+                const page = Math.floor(haut / hPage);
+                if (bas > (page + 1) * hPage - 8 * k && (bas - haut) < hPage) {
+                    const vide = document.createElement('div');
+                    vide.style.height = ((page + 1) * hPage - haut + 2) + 'px';
+                    sec.parentNode.insertBefore(vide, sec);
+                }
+            });
+            boite.style.height = Math.ceil(copie.offsetHeight / k) + 'px';
+
+            // Position de chaque photo sur les pages (pour la rendre cliquable dans le PDF)
+            const mm = 210 / LARGEUR_PDF;
+            const cr = copie.getBoundingClientRect();
+            const photos = Array.from(copie.querySelectorAll('.preview-photos img')).map(img => {
+                const r = img.getBoundingClientRect();
+                const haut = r.top - cr.top;
+                const page = Math.floor(haut / HAUTEUR_PAGE_PDF);
+                const titre = img.closest('.preview-section').querySelector('h3');
+                return {
+                    src: img.getAttribute('src'),
+                    titre: titre ? titre.textContent : '',
+                    page: page + 1,
+                    x: (r.left - cr.left) * mm,
+                    y: (haut - page * HAUTEUR_PAGE_PDF) * mm,
+                    w: r.width * mm,
+                    h: r.height * mm
+                };
+            });
+
+            opt.html2canvas = { scale: 2, scrollX: 0, scrollY: 0 };
             return new Promise((resolve, reject) => {
-                html2pdf().set(opt).from(copie).toPdf().get('pdf')
-                    .then(pdf => resolve(pdf))
+                html2pdf().set(opt).from(boite).toPdf().get('pdf')
+                    .then(pdf => resolve({ pdf, photos }))
                     .catch(reject);
             }).finally(() => zone.remove());
         }
